@@ -1,10 +1,11 @@
 set nu
 "set go= "不要图形按钮
 "color asmanian2  "设置背景主题
-set guifont=Courier_New:h10:cANSI "设置字体
-syntax on   "语法高亮
+set guifont=Courier_New:h14:cANSI "设置字体
+syntax enable "语法高亮
 autocmd InsertLeave * se nocul "用浅色高亮当前行
 autocmd InsertEnter * se cul "用浅色高亮当前行
+autocmd BufNewFile,BufRead *.gradle setf groovy  "gradle设置
 "set ruler  "显示标尺
 set showcmd "输入的命令显示出来
 set cmdheight=1 "命令行（状态行下）的高度设置为1
@@ -20,10 +21,15 @@ set bs=2 "make backspace behave like normal again
 set nocompatible "去掉有关vi一致性模式，避免以前版本的一些bug和局限
 "显示中文帮助
 if version >= 603
-	set helplang=cn
-	set encoding=utf-8
+set helplang=cn
+set encoding=utf-8
 endif
-"colorscheme murphy "设置配色方案
+
+"搜索方式，智能大小写:当有大写字母时为大小写敏感搜索 ignorecase/noignorecase
+"在搜索时，使用\c表示忽略大小写，而\C表示对大小写敏感
+set ignorecase smartcase
+set hlsearch  "或者nohlsearch，搜索字符非高亮显示
+"取消高亮显示“:nohl”
 
 "set fencs=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936
 "set termencoding=utf-8
@@ -34,35 +40,35 @@ set fileencoding=utf-8
 "新建文件加标题
 """"""""""""""""""""""""""""""""""""""""""
 "新建*.sh文件时，插入文件头 
-autocmd BufNewFile *.sh call ShTitleInsert()
+"autocmd BufNewFile *.sh call ShTitleInsert()
 function ShTitleInsrt()
-	call setline(1,"\########################################")
-	call append(line("."),"\# @Program: ".expand("%"))
-	call append(line(".")+1,"\# @Description: ".expand("%"))
-	call append(line(".")+2,"\# @Author: Donzy")
-	call append(line(".")+3,"\# @Email: gxd.try@gmail.com")
-	call append(line(".")+4,"\# @Created Time: ".strftime("%Y-%m-%d %H:%M:%S"))
-	call append(line(".")+5,"\########################################")
-	call append(line(".")+6,"\#!/bin/sh")
-	call append(line(".")+7,"")
+call setline(1,"\########################################")
+call append(line("."),"\# @Program: ".expand("%"))
+call append(line(".")+1,"\# @Description: ".expand("%"))
+call append(line(".")+2,"\# @Author: Donzy")
+call append(line(".")+3,"\# @Email: gxd.try@gmail.com")
+call append(line(".")+4,"\# @Created Time: ".strftime("%Y-%m-%d %H:%M:%S"))
+call append(line(".")+5,"\########################################")
+call append(line(".")+6,"\#!/bin/sh")
+call append(line(".")+7,"")
 endfunction
 
 "新建*.py文件时，插入文件头
-autocmd BufNewFile *.py call PyTitleInsert()
+"autocmd BufNewFile *.py call PyTitleInsert()
 function PyTitleInsert()
-	call setline(1,"\# -*- coding: utf-8 -*-")
-	call append(line("."),"'''")
-	call append(line(".")+1," @Program: ")
-	call append(line(".")+2," @Description: ")
-	call append(line(".")+3," @Author: Donzy")
-	call append(line(".")+4," @Email: gxd.try@gmail.com")
-	call append(line(".")+5," @Created Time: ".strftime("%Y-%m-%d %H:%M:%S"))
-	call append(line(".")+6," @Python release 3.5.1")
-	call append(line(".")+7,"'''")
+call setline(1,"\# -*- coding: utf-8 -*-")
+call append(line("."),"'''")
+call append(line(".")+1," @Program: ")
+call append(line(".")+2," @Description: ")
+call append(line(".")+3," @Author: Donzy")
+call append(line(".")+4," @Email: gxd.try@gmail.com")
+call append(line(".")+5," @Created Time: ".strftime("%Y-%m-%d %H:%M:%S"))
+call append(line(".")+6," @Python release 3.5.1")
+call append(line(".")+7,"'''")
 endfunction
 
 "其他新建文件的文件头添加，后续增加
-		
+	
 """"""""""""""""""""""""""""""""""""""""""
 "键盘命令
 """"""""""""""""""""""""""""""""""""""""""
@@ -75,9 +81,9 @@ set clipboard=unnamed
 
 "快速保存命令
 "ctrl-s默认是挂起终端，需要在.bashrc中增加stty -ixon,使ctrl-s与ctrl-q失效
-nnoremap <C-S> :update<CR>
-vnoremap <C-S> <ESC><ESC>:update<CR>
-inoremap <C-S> <ESC><ESC>:update<CR>
+nmap <C-S> :update<CR>
+vmap <C-S> <ESC><ESC>:update<CR>
+imap <C-S> <ESC><ESC>:update<CR>
 
 "新建vim的tab
 ":Te当前目录下，打开文件,:tabnew打开空的标签
@@ -88,39 +94,62 @@ nnoremap <leader>T :tabnew<CR>
 noremap <leader>n <ESC>:tabprevious<CR>
 noremap <leader>m <ESC>:tabnext<CR>
 
+"在vim的insert模式下，快速移动
+"到行末，继续输入
+inoremap ;l <ESC><ESC>$a
+nnoremap ;l $a
+"到行首，继续输入
+inoremap ;h <ESC><ESC>^i
+nnoremap ;h ^i
+"在insert模式下跳出()[]""<>等,在其后继续编辑
+inoremap ;<Space> <ESC><ESC>/[)\]"'>},]<CR>:nohl<CR>a
+"在insert/visual模式下快速进入normal模式
+inoremap jk <ESC><ESC>
+
+"快速保存退出
+nnoremap <leader>q :q<CR>
+nnoremap <leader>wq :wq<CR>
+
 "分屏同步移动 :set scb  ,解开命令 :set scb! 注：set scb是set scrollbind简写
 "在vim中打开文件 :e filename
 
 "分屏后的切换屏幕
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+nnoremap <C-j> <C-W><C-J>
+nnoremap <C-k> <C-W><C-K>
+nnoremap <C-l> <C-W><C-L>
+nnoremap <C-h> <C-W><C-H>
 
-"python设置程序断点，调试点，可以结合F5按键使用
-map <leader>b Oimport ipdb; ipdb.set_trace() #BREAKPOINT<C-c>
+"python设置程序断点，调试点，可以结合F11按键使用
+nnoremap <leader>b Oimport ipdb; ipdb.set_trace() #BREAKPOINT<ESC><ESC>
 
 "F5运行本文件，根据后缀名
 "expand("%:e")后缀名，%文件名，%:t:r主文件名，%:p文件全路径
 nnoremap <F5>  :call RunProgram(expand("%:e"))<CR>
 function! RunProgram(type)
-	if a:type == "py"
-		exec ":w"
-		"可以结合ipdb使用，调试程序 ',b<F5>'
-		exec "!python3 %" 
-	endif
+if a:type == "py"
+	exec ":w"
+	"可以结合ipdb使用，调试程序 ',b<F5>'
+	exec "!python3 %" 
+endif
+if a:type == "java"
+	exec ":w"
+	"javac 编译执行java文件（依赖eclim）
+	exec ":Java %"
+endif
+	
 endfunction
 
 "F8调试该文件，根据后缀名
 nnoremap <F8>  :call DebugProgram(expand("%:e"))<CR>
 function! DebugProgram(type)
-	if a:type == "py"
-		exec ":w"
-		exec "!python3 -m pudb %"
-	endif
+if a:type == "py"
+	exec ":w"
+	exec "!python3 -m pudb %"
+endif
 endfunction	
 
 """"""""""""""""""""""""""""""""""""""""""
+"bundle配置
 filetype off
 
 "set the runtime paty to include Vundle and initilize
@@ -145,59 +174,40 @@ Plugin 'tomasr/molokai' "更好的配色
 Plugin 'davidhalter/jedi-vim' "python补全
 Plugin 'ervandew/supertab' "vim insert模式下的Tab补全
 Plugin 'Lokaltog/vim-powerline' "vim加强状态栏
-Plugin 'python-rope/ropevim' "python重构和code-assists等功能
+"Plugin 'python-rope/ropevim' "python重构和code-assists等功能
 Plugin 'ctrlpvim/ctrlp.vim' "regexp / Most Recently Used(MRU) files monitoring / create new files and dirs / github上了解详情
 "Plugin 'Valloric/YouCompleteMe' "自动补全神器
 Plugin 'scrooloose/nerdtree' "nerdTree插件，树状文件管理
-Plugin 'MarcWeber/vim-addon-mw-utils' "snipmate插件依赖此插件
-Plugin 'tomtom/tlib_vim' "snipmate插件依赖此插件
-Plugin 'garbas/vim-snipmate' "减少写重复代码
+Plugin 'SirVer/ultisnips' "自动生成代码片段，类似于snipmate
+Plugin 'honza/vim-snippets' "Snippets are spparated form the engine. Add this if you want them; 代码片段，配合ultisnips使用
 Plugin 'majutsushi/tagbar' "类似于outline
 Plugin 'terryma/vim-multiple-cursors' "类似于sublime的多光标编辑功能
 Plugin 'vim-scripts/c.vim' "c/c++ IDE
 Plugin 'upsuper/vim-colorschemes' "集成了很多主题，可选cobalt
-
+Plugin 'Yggdroot/indentLine' "垂直缩进线
+"Plugin 'idanarye/vim-vebugger' "GDB、JDB、Mdbg、PDB、RDebug调试器
+Plugin 'klen/python-mode' "工具集合
 
 "All of your Plugins must be added before the following line
 call vundle#end()
 filetype plugin indent on
-
+autocmd FileType python setlocal et sta sw=4 sts=4
 
 "Enable folding
-set foldmethod=syntax
+autocmd FileType python setlocal foldmethod=indent
 set foldlevel=99
-
 
 "PEP8风格的缩进，vim中Tab键相当于4个标准空格，每行代码长队不超过80字符，文件以unix格式存储，其他用户不会出现文件转换问题
 au BufNewFile,BufRead *.py  set tabstop=4 | set softtabstop=4 | set shiftwidth=4 | set textwidth=79 | set expandtab | set autoindent | set fileformat=unix 
 
 "对于全栈程序员，可以针对每种文件类型设置au命令
-au BufNewFile,BufRead *.js,*.html,*.css set tabstop=4 | set softtabstop=4 | set shiftwidth=4
+au BufNewFile,BufRead *.java,*.c,*.h,*.cpp,*.js,*.html,*.css set tabstop=4 | set softtabstop=4 | set shiftwidth=4
 
 "不必要的空格，希望vim可以帮助我们标示出来
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match Error /\s\+$/
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h,*.cpp,*.java match Error /\s\+$/
 
-"设置YouCompleteMe
-let g:ycm_python_binary_path='/usr/bin/python3'
-let g:ycm_min_num_of_chars_for_completion=2 "最少几个基础字符开始补全
-let g:ycm_min_num_identifier_candidate_chars=0 
-let g:ycm_auto_tirgger=1 "0表示自动触发关闭，1表示打开
-let g:ycm_filetype_whitelist={'*':1}
-let g:ycm_filetype_blacklist={
-			\ 'tagbar':1,
-			\ 'qf':1,
-			\ 'notes':1,
-			\ 'markdown':1,
-			\ 'unite':1,
-			\ 'text':1,
-			\ 'vimwiki':1,
-			\ 'pandoc':1,
-			\ 'infolog':1,
-			\ 'mail':1
-			\}
-let g:ycm_filetype_specific_completion_to_disable={
-			\ 'gitcommit':1
-			\}
+"智能缩进
+set autoindent
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""
@@ -214,14 +224,16 @@ let g:ycm_filetype_specific_completion_to_disable={
 "写html比较快，各种简写，让代码飞起来，看文档
 
 "jedi-vim插件配置，强大的python的自动补全,直接用，不折腾
+let g:jedi#force_py_version=3
 let g:jedi#completions_command="<Tab>" "补全一般用Tab键
+inoremap <Shift-Tab> <Tab>
+"使用Shift+Tab输入Tab，防止补全对Tab输入的影响
 let g:jedi#goto_assignments_command="<leader>g"
 let g:jedi#goto_definitions_command="<leader>d"
 let g:jedi#documentation_command="<K>"
 let g:jedi#rename_command="<leader>r"
-let g:jedi#usages_command="<leader>m"
+let g:jedi#usages_command="<leader>u"
 nnoremap <leader>pi <ESC>:Pyimport<CR>
-let g:jedi#force_py_version=3
 
 "PowerLine插件配置，使用前要设置几项，参考文档,default设置，不折腾
 set t_Co=256 "256色
@@ -244,13 +256,24 @@ nnoremap ntc <ESC>:NERDTreeClose<CR>
 nnoremap ntf <ESC>:NERDTreeFind<CR>
 nnoremap ntd <ESC>:NERDTreeCWD<CR>
 
-"SnipMate配置设置
+"UltiSnips插件配置,https://github.com/vim-scripts/UltiSnips有学习视频
+"let g:UltiSnipsUsePythonVersion=3
+let g:UltiSnipsListSnippets="<C-Tab>"
+let g:UltiSnipsExpandTrigger="<C-n>"
+let g:UltiSnipsJumpForwardTrigger=";n"
+let g:UltiSnipsJumpBackwardTrigger=";p"
+let g:UltiSnipsSnippetsDirectories=["UltiSnips"]
+"编辑/添加本文件类型的snippets
+nnoremap snpe :UltiSnipsEdit<CR>  
+"If you want :UltiSnipEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+"只有在nerdtree的buf中有效，添加书签
+nnoremap :bm :Bookmark
 
 
 "tagbar配置设置
 "使用tagbar需要先安装ctags，并用 ctags -R . 产生tag
-filetype on  
-noremap <silent><F9> <ESC><ESC>:Tagbar<CR> 
+nnoremap <leader>o  <ESC><ESC>:Tagbar<CR> 
 
 "vim-multiple-cursor配置设置
 "默认设置
@@ -262,7 +285,78 @@ let g:multi_cursor_quit_key='<ESC>'
 "csupport配置设置
 "使用默认设置，:help csupport查看具体用法
 
+"solarized主题设置
+set background=dark
+colorscheme solarized
+
+"Eclim配置
+let g:EclimCompletionMethod='omnifunc' 
+"结合SuperTab设置Tab键为eclim补全唤醒键
+let g:SuperTabDefaultCompletionType='context'
+nnoremap pc :ProjectCreate
+nnoremap pl :ProjectList<CR>
+nnoremap po :ProjectOpen
+"eclipse常用功能快捷键配置
+"代码静态检查
+nnoremap <leader>v :EclimValidate<CR>
+"代码修正意见
+nnoremap <leader>c :JavaCorrect<CR>
+"运行本java文件
+nnoremap <C-r> :Java %<CR>
 
 
+"ctags设置
+set tags=/home/donzy/workspace/Src/redis-3.0.7/tags;
+set tags+=/home/donzy/workspace/Src/lucene-6.0.0/tags;
+set tags+=/home/donzy/workspace/Src/nginx-1.9.9/tags;
+set tags+=/home/donzy/workspace/Src/nginx-1.8.0/tags;
+set autochdir
+"快捷键ctrl+] 与 ctrl+o/t
+
+"vebugger设置
+"let g:vebugger_leader='.'
+"let g:vebugger_path_jdb="/usr/local/jdk1.8.0_77/bin/jdb"
+
+"Python-mode配置
+"Turn on the whole plugin
+let g:pymode=1
+"Trim unused white spaces on save
+let g:pymode_trim_whitespaces=1
+"Setup default python options ,参考pymode文档
+let g:pymode_options=1
+"Setup pymode quickfix window
+let g:pymode_quickfix_minheight=3
+let g:pymode_quickfix_maxheight=6
+"Python version设置
+let g:pymode_python='python3'
+"Enable pymode indentation
+let g:pymode_indent=1
+"Enable pymode folding
+let g:pymode_folding=1
+"Enable pymode-motion,会有很多可用的快捷键，参考pymode文档
+let g:pymode_motion=1
+"Turn on the documentation script
+let g:pymode_doc=1
+"Bind keys to show documentation for current word(selection)
+let g:pymode_doc_bind='K'
+"Turn on code checking
+let g:pymode_lint=1
+"Check code on every save(if file has been modified)
+let g:pymode_lint_on_write=1
+"Check code when editing(on the fly)
+"let g:pymode_lint_on_fly=0
+"Show error message if cursor placed at the error line
+let g:pymode_lint_message=1
+"Default code checkers (you could set several)         
+let g:pymode_lint_checkers=['pyflakes', 'pep8', 'mccabe']
+"Sort errors by relevance
+let g:pymode_lint_sort=['E', 'C', 'I']
+"Auto open cwindow (quickfix) if any errors have been found
+let g:pymode_lint_cwindow=1
+
+"rope设置参考pymode文档
+
+"Turn on pymode syntax
+let g:pymode_syntax=1
 
 
